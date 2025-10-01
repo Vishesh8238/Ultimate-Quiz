@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mixed Anime Quiz — Naruto & Demon Slayer (LALIT AND UTKARSH)</title>
+  <style>
+    :root{
+      --bg:#0b1020; --card:#071126; --muted:#9aa6bf; --accent:#ff6b6b; --glass: rgba(255,255,255,0.04);
+      --text:#eaf2ff; --success:#7bed9f; --danger:#ff6b6b;
+    }
+    *{box-sizing:border-box;font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#040714 0%,var(--bg) 100%);color:var(--text)}
+    .wrap{max-width:1000px;margin:20px auto;padding:18px}
+
+    header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .brand{font-weight:800;letter-spacing:1px}
+    .sub{color:var(--muted);font-size:13px}
+
+    .card{background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:18px;box-shadow:0 10px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+
+    .controls{display:flex;gap:10px;align-items:center}
+    .btn{padding:8px 12px;border-radius:10px;border:none;background:var(--accent);color:#021;cursor:pointer;font-weight:700}
+    .outline{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    .tiny{padding:6px 8px;font-size:13px}
+
+    .flex{display:flex;gap:12px}
+    .left{flex:1}
+    .right{width:320px}
+
+    .question{margin-top:12px}
+    h2{margin:0;font-size:20px}
+    p.lead{color:var(--muted);margin:6px 0}
+
+    .options{display:grid;gap:8px;margin-top:12px}
+    .option{background:var(--glass);padding:10px;border-radius:10px;cursor:pointer;border:1px solid transparent}
+    .option.selected{border-color:rgba(255,255,255,0.12);box-shadow:0 6px 16px rgba(0,0,0,0.6)}
+
+    .meta{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+    .timer{font-weight:800}
+
+    .footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+
+    .accent-input{width:42px;height:36px;border-radius:8px;border:none;padding:4px}
+    .hint-box{background:rgba(0,0,0,0.25);padding:10px;border-radius:8px;color:var(--muted);font-size:14px}
+
+    .long-answer{width:100%;min-height:100px;padding:10px;border-radius:8px;border:1px dashed rgba(255,255,255,0.06);background:transparent;color:var(--text)}
+
+    .progress{height:10px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
+    .progress > i{display:block;height:100%;background:linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.12));width:0%}
+
+    .center{text-align:center}
+    .small{font-size:13px;color:var(--muted)}
+
+    /* Day theme */
+    .day{--bg:#e8f4ff;--card:#ffffff;--text:#071428;--muted:#475569;--glass:rgba(2,6,23,0.03)}
+    .day .card{box-shadow:0 8px 30px rgba(2,6,23,0.06)}
+
+    /* intense anime vibes */
+    .anime-bg{background-image:radial-gradient(circle at 10% 10%, rgba(255,107,107,0.06), transparent 10%), radial-gradient(circle at 90% 90%, rgba(102,178,255,0.04), transparent 10%)}
+
+    footer small{color:var(--muted)}
+
+    @media(max-width:900px){.right{width:100%}.flex{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <div class="brand">MIXED ANIME QUIZ</div>
+        <div class="sub">Only NARUTO & DEMON SLAYER — Level: 100 — Welcome, LALIT AND UTKARSH !</div>
+      </div>
+      <div class="controls">
+        <label class="small">Theme</label>
+        <button id="themeBtn" class="btn tiny outline">Night/Day</button>
+        <label class="small">Accent</label>
+        <input id="accent" class="accent-input" type="color" value="#ff6b6b" title="Change accent color" />
+      </div>
+    </header>
+
+    <main class="card anime-bg" id="app">
+      <div id="home" class="card">
+        <h2>Instructions</h2>
+        <p class="lead">20 Questions • Total = <strong>100 marks</strong> • Time = <strong>10 minutes</strong></p>
+        <ul>
+          <li>15 MCQs (10 Naruto, 5 Demon Slayer). Each MCQ = <strong>5 marks</strong>. Wrong answer = <strong>-2.5</strong> (negative marking). No penalty for skipping.</li>
+          <li>5 Long-answer questions (20+ words) — each worth <strong>5 marks</strong>. No negative marking for long answers.</li>
+          <li>Only <strong>3 hints</strong> available for the whole quiz (hints will be generic, not answer reveals).</li>
+          <li>All questions are difficulty Level <strong>100</strong>. Anime vibes ON ⚔️</li>
+        </ul>
+        <div class="flex" style="margin-top:12px;align-items:center">
+          <div>
+            <button class="btn" onclick="startQuiz()">Start Quiz</button>
+          </div>
+          <div class="small">Good luck, LALIT AND UTKARSH — go all out!</div>
+        </div>
+      </div>
+
+      <div id="quiz" style="display:none">
+        <div class="flex">
+          <div class="left">
+            <div class="meta">
+              <div class="small">Question <span id="qIdx">1</span>/20 • <span id="qLevel">Level 100</span></div>
+              <div class="timer">⏱ <span id="time">10:00</span></div>
+            </div>
+
+            <div class="question" id="questionArea"></div>
+
+            <div id="opts" class="options"></div>
+
+            <div id="longAnswerArea" style="margin-top:12px;display:none">
+              <textarea id="longAnswer" class="long-answer" placeholder="Type at least 20 words for full marks..."></textarea>
+              <div class="small" style="margin-top:6px">Words: <span id="wordCount">0</span></div>
+            </div>
+
+            <div class="footer">
+              <div>
+                <button class="btn outline" id="hintBtn">Use Hint (<span id="hintsLeft">3</span>)</button>
+                <button class="btn outline" onclick="skipQ()">Skip</button>
+              </div>
+              <div>
+                <button class="btn" onclick="nextQ()">Save & Next</button>
+              </div>
+            </div>
+
+            <div style="margin-top:12px">
+              <div class="progress"><i id="progBar"></i></div>
+            </div>
+          </div>
+
+          <aside class="right">
+            <div class="card">
+              <div class="center"><strong>Quiz Summary</strong></div>
+              <hr />
+              <div class="small">Remaining time</div>
+              <div style="font-weight:800;font-size:20px;margin-top:6px" id="sideTime">10:00</div>
+              <div style="margin-top:12px;display:flex;justify-content:space-between">
+                <div class="small">Hints</div><div id="sideHints" class="small">3</div>
+              </div>
+              <div style="margin-top:12px">
+                <div class="small">Score (so far)</div>
+                <div style="font-weight:900;font-size:18px" id="liveScore">0</div>
+              </div>
+              <div style="margin-top:12px">
+                <div class="small">Answered</div>
+                <div id="answered" class="small">0 / 20</div>
+              </div>
+              <div style="margin-top:10px">
+                <div class="small">Progress</div>
+                <div class="progress" style="margin-top:6px"><i id="sideProg" style="width:0%"></i></div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top:12px">
+              <strong>Hints (generic)</strong>
+              <div id="hintText" class="hint-box">Hints will be generic reminders — no direct answers.</div>
+            </div>
+
+            <div class="card" style="margin-top:12px;text-align:center">
+              <div class="small">Accent color</div>
+              <input id="accent2" class="accent-input" type="color" value="#ff6b6b" />
+            </div>
+
+          </aside>
+        </div>
+      </div>
+
+      <div id="result" style="display:none;margin-top:12px">
+        <div class="card center">
+          <h2>Result</h2>
+          <div class="small">Final Score (out of 100)</div>
+          <div style="font-size:48px;font-weight:900;margin-top:6px" id="finalScore">0</div>
+          <div style="margin-top:8px" id="rankText" class="small">Level: ---</div>
+          <div style="margin-top:12px" id="breakdown" class="small"></div>
+          <div style="margin-top:12px">
+            <button class="btn" onclick="restart()">Retake Quiz</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <footer style="margin-top:12px" class="small center">Made intense & anime — all content: Naruto & Demon Slayer only. Good luck, LALIT AND UTKARSH!</footer>
+  </div>
+
+<script>
+// QUESTIONS: 15 MCQs (10 Naruto,5 Demon Slayer) + 5 long-answer (mix)
+const data = [
+  // 1-10 Naruto MCQs
+  {type:'mcq',q:"Which clan in Naruto is famous for the Sharingan?",options:['Uchiha','Hyuga','Akimichi','Uzumaki'],ans:0},
+  {type:'mcq',q:"What is the name of Naruto's signature jutsu?",options:['Chidori','Rasengan','Amaterasu','Rinnegan'],ans:1},
+  {type:'mcq',q:"Who becomes the Seventh Hokage?",options:['Sasuke Uchiha','Naruto Uzumaki','Kakashi Hatake','Tsunade Senju'],ans:1},
+  {type:'mcq',q:"What is the name of Naruto's father?",options:['Minato Namikaze','Hashirama Senju','Fugaku Uchiha','Hiruzen Sarutobi'],ans:0},
+  {type:'mcq',q:"Which jutsu involves summoning toads?",options:['Summoning Jutsu','Water Clone Jutsu','Shadow Clone Jutsu','Fireball Jutsu'],ans:0},
+  {type:'mcq',q:"Who teaches Naruto the Rasengan?",options:['Jiraiya','Kakashi','Tsunade','Orochimaru'],ans:0},
+  {type:'mcq',q:"What is Sasuke's goal for a long time?",options:['To be Hokage','To find his family','To avenge his clan','To become a merchant'],ans:2},
+  {type:'mcq',q:"Which village is Naruto from?",options:['Sunagakure','Konohagakure','Kirigakure','Iwagakure'],ans:1},
+  {type:'mcq',q:"What is the name of the Nine-Tailed Fox sealed inside Naruto?",options:['Kurama','Shukaku','Matatabi','Isobu'],ans:0},
+  {type:'mcq',q:"Which eye dojutsu does Kakashi famously copy?",options:['Byakugan','Sharingan','Tenseigan','Mangekyo'],ans:1},
+  // 11-15 Demon Slayer MCQs
+  {type:'mcq',q:"What is the main weapon used by Demon Slayers?",options:['Katanas','Bows','Spears','Guns'],ans:0},
+  {type:'mcq',q:"What is Tanjiro's sister's name?",options:['Nezuko','Kanao','Shinobu','Mitsuri'],ans:0},
+  {type:'mcq',q:"Which breathing style does Tanjiro primarily use?",options:['Thunder','Water','Flame','Wind'],ans:1},
+  {type:'mcq',q:"Who is the Demon Slayer Hashira of Insect Breathing?",options:['Giyu Tomioka','Shinobu Kocho','Tengen Uzui','Sanemi Shinazugawa'],ans:1},
+  {type:'mcq',q:"What does Muzan Kibutsuji represent in the story?",options:['The First Demon','A Village Leader','A Swordsmith','A Hunter'],ans:0},
+  // 16-20 Long answer prompts (5 questions)
+  {type:'long',q:"Explain Tanjiro Kamado's motivation and how it shapes his journey in at least 20 words."},
+  {type:'long',q:"Describe Naruto Uzumaki's growth from an outcast to a hero. Mention key turning points (20+ words)."},
+  {type:'long',q:"Discuss the role of bonds and family in Demon Slayer, giving examples (20+ words)."},
+  {type:'long',q:"Explain how Sasuke's choices contrast with Naruto's ideals (20+ words)."},
+  {type:'long',q:"In your words, why are the battles in Naruto emotionally intense? Give examples (20+ words)."}
+];
+
+let state = {idx:0,answers: Array(20).fill(null),longAns:Array(20).fill(''),score:0,hintsLeft:3,timeLeft:600, timer:null, started:false};
+
+const MAX_TIME = 600; // 10 minutes in seconds
+const MCQ_MARK = 5; const WRONG_PENALTY = -2.5;
+
+function startQuiz(){
+  document.getElementById('home').style.display='none';
+  document.getElementById('quiz').style.display='block';
+  state.started=true; state.idx=0; state.hintsLeft=3; state.timeLeft=MAX_TIME; state.answers = Array(20).fill(null); state.longAns=Array(20).fill(''); state.score=0;
+  renderQuestion(); updateSummary();
+  state.timer = setInterval(()=>{ state.timeLeft--; updateTime(); if(state.timeLeft<=0){ finishQuiz(); }},1000);
+}
+
+function formatTime(s){ const m = Math.floor(s/60); const sec = s%60; return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}` }
+function updateTime(){ document.getElementById('time').innerText = formatTime(state.timeLeft); document.getElementById('sideTime').innerText = formatTime(state.timeLeft); }
+
+function renderQuestion(){
+  const i = state.idx; document.getElementById('qIdx').innerText = i+1; document.getElementById('qLevel').innerText='Level 100';
+  const q = data[i]; const area = document.getElementById('questionArea'); area.innerHTML='';
+  if(q.type==='mcq'){
+    document.getElementById('longAnswerArea').style.display='none';
+    area.innerHTML = `<h2>${q.q}</h2><div class="small">(MCQ • 5 marks • Wrong: ${WRONG_PENALTY})</div>`;
+    const opts = document.getElementById('opts'); opts.innerHTML='';
+    q.options.forEach((o,idx)=>{
+      const d = document.createElement('div'); d.className='option'; d.innerText = String.fromCharCode(65+idx)+'. '+o;
+      if(state.answers[i]===idx) d.classList.add('selected');
+      d.onclick = ()=>{ state.answers[i] = idx; Array.from(document.querySelectorAll('.option')).forEach(el=>el.classList.remove('selected')); d.classList.add('selected'); updateSummary(); };
+      opts.appendChild(d);
+    });
+  } else {
+    document.getElementById('opts').innerHTML=''; document.getElementById('longAnswerArea').style.display='block';
+    area.innerHTML = `<h2>${q.q}</h2><div class="small">(Long answer • 5 marks • Write at least 20 words)</div>`;
+    const ta = document.getElementById('longAnswer'); ta.value = state.longAns[i] || '';
+    ta.oninput = ()=>{ state.longAns[i]=ta.value; document.getElementById('wordCount').innerText = countWords(ta.value); updateSummary(); };
+    document.getElementById('wordCount').innerText = countWords(ta.value);
+  }
+  // progress
+  const perc = Math.round((i/20)*100);
+  document.getElementById('progBar').style.width = perc+'%'; document.getElementById('sideProg').style.width = perc+'%';
+}
+
+function countWords(s){ if(!s) return 0; return s.trim().split(/\s+/).filter(Boolean).length; }
+
+function nextQ(){
+  // save current selections already in state
+  if(state.idx < 19){ state.idx++; renderQuestion(); } else { finishQuiz(); }
+  updateSummary();
+}
+function skipQ(){ state.answers[state.idx]=null; state.longAns[state.idx]=''; nextQ(); }
+
+function useHint(){ if(state.hintsLeft<=0) return alert('No hints left!'); state.hintsLeft--; document.getElementById('hintsLeft').innerText = state.hintsLeft; document.getElementById('sideHints').innerText = state.hintsLeft; const hints = [
+  'Think about key relationships and origins rather than exact phrases.',
+  'Remember signature moves and symbols tied to characters.',
+  'Consider the emotional motive behind actions — not just events.'
+];
+  const i = 3 - state.hintsLeft - 1; // show next hint
+  document.getElementById('hintText').innerText = hints[3 - state.hintsLeft - 1] || 'Trust your instincts.';
+}
+
+function updateSummary(){
+  // live scoring for MCQs only
+  let mcqScore = 0; let answered = 0; let longAnswered = 0;
+  for(let i=0;i<20;i++){
+    const q=data[i]; if(q.type==='mcq'){ const a = state.answers[i]; if(a!==null && a!==undefined){ answered++; if(a===q.ans){ mcqScore += MCQ_MARK } else { mcqScore += WRONG_PENALTY } } }
+    else { if(state.longAns[i] && countWords(state.longAns[i])>0) { answered++; longAnswered++; } }
+  }
+  // long answers not counted until finish; show mcq-based live
+  document.getElementById('liveScore').innerText = Math.max(0, Math.round(mcqScore*100)/100);
+  document.getElementById('answered').innerText = answered + ' / 20';
+}
+
+function finishQuiz(){ clearInterval(state.timer); // compute final
+  let total = 0; let mcqTotal=0; let longTotal=0; let mcqPossible = 0;
+  for(let i=0;i<20;i++){
+    const q=data[i]; if(q.type==='mcq'){ const a = state.answers[i]; if(a===null || a===undefined) { /* no marks */ } else if(a===q.ans){ mcqTotal += MCQ_MARK } else { mcqTotal += WRONG_PENALTY } }
+    else { const text = state.longAns[i] || ''; if(countWords(text) >= 20) { longTotal += 5 } }
+  }
+  total = mcqTotal + longTotal; if(total<0) total = 0; if(total>100) total = 100; total = Math.round(total*100)/100;
+  document.getElementById('finalScore').innerText = total;
+  // rank
+  let rank='D'; let rankText='Novice';
+  if(total>=90){ rank='S'; rankText='S-Rank — Legendary'; }
+  else if(total>=75){ rank='A'; rankText='A-Rank — High Shinobi/Hashira'; }
+  else if(total>=50){ rank='B'; rankText='B-Rank — Seasoned Fighter'; }
+  else if(total>=25){ rank='C'; rankText='C-Rank — Beginner'; }
+  else { rank='D'; rankText='D-Rank — Needs training'; }
+  document.getElementById('rankText').innerText = `${rankText} (${rank}) — Well played, LALIT AND UTKARSH!`;
+  document.getElementById('breakdown').innerText = `MCQ score: ${mcqTotal} • Long answer score: ${longTotal}`;
+
+  document.getElementById('quiz').style.display='none'; document.getElementById('result').style.display='block';
+}
+
+function restart(){ document.getElementById('result').style.display='none'; document.getElementById('home').style.display='block'; }
+
+// small helpers
+function changeAccent(color){ document.documentElement.style.setProperty('--accent',color); }
+
+// events
+document.getElementById('hintBtn').onclick = ()=>{ if(state.started) useHint(); else alert('Start the quiz first'); }
+
+document.getElementById('accent').oninput = (e)=> changeAccent(e.target.value);
+document.getElementById('accent2').oninput = (e)=>{ document.getElementById('accent').value = e.target.value; changeAccent(e.target.value); };
+
+document.getElementById('themeBtn').onclick = ()=>{
+  document.body.classList.toggle('day');
+};
+
+// keyboard friendly: Enter to next
+window.nextQ = nextQ; window.startQuiz = startQuiz; window.skipQ = skipQ; window.finishQuiz = finishQuiz; window.restart = restart;
+</script>
+</body>
+</html>
